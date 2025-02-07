@@ -27,7 +27,7 @@ public class DatabaseUserDetailsService implements UserDetailsService {
       throw new UsernameNotFoundException("Authentication failed!");
     }
     User user = optionalUser.get();
-    List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole()));
+    List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole().toString()));
     return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
   }
 }

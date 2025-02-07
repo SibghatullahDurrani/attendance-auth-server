@@ -1,5 +1,6 @@
 package com.main.face_recognition_auth_server.domains;
 
+import com.main.face_recognition_auth_server.constants.UserRoles;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -25,5 +26,6 @@ public class User {
   private String username;
 
   @Column(name = "role", nullable = false, length = 30)
-  private String role;
+  @Enumerated(EnumType.STRING)
+  private UserRoles role;
 }
