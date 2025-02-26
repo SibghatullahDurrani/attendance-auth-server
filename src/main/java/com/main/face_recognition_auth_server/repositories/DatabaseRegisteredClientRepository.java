@@ -57,7 +57,8 @@ public class DatabaseRegisteredClientRepository implements RegisteredClientRepos
               .redirectUri(client.getRedirectURI())
               .scope(OidcScopes.OPENID)
               .tokenSettings(TokenSettings.builder()
-                      .accessTokenTimeToLive(Duration.ofHours(12))
+                      .accessTokenTimeToLive(Duration.ofHours(1))
+                      .refreshTokenTimeToLive(Duration.ofDays(7))
                       .build())
               .build();
     } else {

@@ -9,7 +9,7 @@ public class CorsFilter implements Filter {
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
     HttpServletResponse res = (HttpServletResponse) response;
-    res.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1:4200");
+    res.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1:4000");
     res.setHeader("Access-Control-Allow-Methods", "*");
     res.setHeader("Access-Control-Allow-Headers", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");

@@ -35,19 +35,11 @@ public class SecurityConfigurations {
   @Bean
   @Order(1)
   public SecurityFilterChain applicationSecurityFilterChain(HttpSecurity http) throws Exception {
-    // TODO: Dont disable cors
     OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = OAuth2AuthorizationServerConfigurer.authorizationServer();
     http.addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class);
-    http
-            .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
-            .with(authorizationServerConfigurer, (authorizationServer) ->
-                    authorizationServer.oidc(Customizer.withDefaults()))
-            .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated());
+    http.securityMatcher(authorizationServerConfigurer.getEndpointsMatcher()).with(authorizationServerConfigurer, (authorizationServer) -> authorizationServer.oidc(Customizer.withDefaults())).authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated());
 
-    http.exceptionHandling((e) ->
-            e.defaultAuthenticationEntryPointFor(
-                    new LoginUrlAuthenticationEntryPoint("/login"),
-                    new MediaTypeRequestMatcher(MediaType.TEXT_HTML)));
+    http.exceptionHandling((e) -> e.defaultAuthenticationEntryPointFor(new LoginUrlAuthenticationEntryPoint("/login"), new MediaTypeRequestMatcher(MediaType.TEXT_HTML)));
 
     return http.build();
   }
@@ -60,15 +52,14 @@ public class SecurityConfigurations {
       CorsConfigurationSource source = _ -> {
         CorsConfiguration cc = new CorsConfiguration();
         cc.setAllowCredentials(true);
-        cc.setAllowedOrigins(List.of("http://127.0.0.1:4200"));
+        cc.setAllowedOrigins(List.of("http://127.0.0.1:4000"));
         cc.setAllowedHeaders(List.of("*"));
         cc.setAllowedMethods(List.of("*"));
         return cc;
       };
       c.configurationSource(source);
     });
-    http.authorizeHttpRequests((authorize) -> authorize.anyRequest().authenticated())
-            .formLogin(Customizer.withDefaults());
+    http.authorizeHttpRequests((authorize) -> authorize.anyRequest().authenticated()).formLogin(Customizer.withDefaults());
 
     return http.build();
   }
