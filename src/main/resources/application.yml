@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: dev
   application:
     name: face_recognition_auth_server
   cloud:
@@ -8,3 +10,5 @@ spring:
       password: configserver123
   config:
     import: configserver:http://localhost:8181
+
+front-end-url: ${FRONT_END_URL_PREFIX}

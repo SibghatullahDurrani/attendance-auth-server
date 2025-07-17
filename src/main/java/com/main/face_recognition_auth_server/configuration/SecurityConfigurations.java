@@ -1,9 +1,11 @@
 package com.main.face_recognition_auth_server.configuration;
 
 import com.main.face_recognition_auth_server.filters.CorsFilter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,6 +30,9 @@ import java.util.stream.Collectors;
 
 @Configuration
 public class SecurityConfigurations {
+  @Value("${front-end-url}")
+  private String FRONT_END_URL;
+
 
   //http://127.0.0.1:8080/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=https://oidcdebugger.com/debug&code_challenge=QYPAZ5NU8yvtlQ9erXrUYR-T5AGCjCF47vN-KsaI2A8&&code_challenge_method=S256
   // qIRFnJ6Dm5DWWrghlk8F553hlCOvL--pYjtJIy9PVIIBkr4auExOpINGGkgB-bNbBMA70QTFiORLz1BQ43rJMlg2ZgL5Bn330J8B7lh_6REvD8JkbmnYaWnq4KnMUxGR
@@ -37,7 +42,9 @@ public class SecurityConfigurations {
   public SecurityFilterChain applicationSecurityFilterChain(HttpSecurity http) throws Exception {
     OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = OAuth2AuthorizationServerConfigurer.authorizationServer();
     http.addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class);
-    http.securityMatcher(authorizationServerConfigurer.getEndpointsMatcher()).with(authorizationServerConfigurer, (authorizationServer) -> authorizationServer.oidc(Customizer.withDefaults())).authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated());
+    http.securityMatcher(authorizationServerConfigurer.getEndpointsMatcher()).with(authorizationServerConfigurer, (authorizationServer) ->
+                    authorizationServer.oidc(Customizer.withDefaults()))
+            .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated());
 
     http.exceptionHandling((e) -> e.defaultAuthenticationEntryPointFor(new LoginUrlAuthenticationEntryPoint("/login"), new MediaTypeRequestMatcher(MediaType.TEXT_HTML)));
 
@@ -52,17 +59,26 @@ public class SecurityConfigurations {
       CorsConfigurationSource source = _ -> {
         CorsConfiguration cc = new CorsConfiguration();
         cc.setAllowCredentials(true);
-        cc.setAllowedOrigins(List.of("http://127.0.0.1:4000"));
+        cc.setAllowedOrigins(List.of(FRONT_END_URL));
         cc.setAllowedHeaders(List.of("*"));
         cc.setAllowedMethods(List.of("*"));
         return cc;
       };
       c.configurationSource(source);
     });
-    http.authorizeHttpRequests((authorize) -> authorize.anyRequest().authenticated()).formLogin(Customizer.withDefaults());
+    http.authorizeHttpRequests((authorize) -> authorize.anyRequest().authenticated())
+            .formLogin(Customizer.withDefaults())
+            .logout(logout -> logout
+                    .deleteCookies("JSESSIONID")
+                    .clearAuthentication(true)
+                    .invalidateHttpSession(true)
+                    .logoutUrl("/logout")
+                    .logoutSuccessUrl(FRONT_END_URL + "/logout")
+            );
 
     return http.build();
   }
+
 
   @Bean
   public PasswordEncoder passwordEncoder() {
