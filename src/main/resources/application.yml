@@ -1,14 +1,27 @@
 spring:
-  profiles:
-    active: dev
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+  jpa:
+    properties:
+      show_sql: true
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
   application:
     name: face_recognition_auth_server
-  cloud:
-    config:
-      uri: http://localhost:8181
-      username: config
-      password: configserver123
-  config:
-    import: configserver:http://localhost:8181
+#  cloud:
+#    config:
+#      uri: http://localhost:8181
+#      username: config
+#      password: configserver123
+#  config:
+#    import: configserver:http://localhost:8181
 
 front-end-url: ${FRONT_END_URL_PREFIX}
+
+RSA:
+  privateKey: ${AUTH_RSA_PR_KEY}
+  publicKey: ${AUTH_RSA_PB_KEY}
